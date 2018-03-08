@@ -58,13 +58,25 @@ def read_temp(temp_sensor):
         temp_f = temp_c * 9.0 / 5.0 + 32.0
         return round(temp_c, 1), round(temp_f, 1)
 
-
-while True:
+temp_values = []
+for i in range(0, 20):
     print('Sensor 1:', read_temp(temp_sensor_1))
     print('Sensor 2:', read_temp(temp_sensor_2))
     print('')
 
-    if read_temp(temp_sensor_1)[1] > 90 or read_temp(temp_sensor_2)[1] > 90:
+    temp_values.append(read_temp(temp_sensor_1)[1])
+    temp_values.append(read_temp(temp_sensor_2)[1])
+
+hot_readings = 0
+cold_readings = 0
+for each in temp_values:
+    if each > 90:
+        hot_readings = hot_readings + 1
+
+    if each < 42:
+        cold_readings = cold_readings + 1
+
+    if hot_readings > 5:
         MESSAGE = "The raspberry pi temperature monitor is reading a temperature of" \
                   + str(read_temp(temp_sensor_1)[1]) + "degrees fahrenheit."
 
@@ -72,9 +84,7 @@ while True:
         server.sendmail(FROM, TO, MESSAGE)
         server.quit()
 
-        time.sleep(300)
-
-    if read_temp(temp_sensor_1)[1] < 42 or read_temp(temp_sensor_2)[1] < 42:
+    if cold_readings > 5:
         MESSAGE = "The raspberry pi temperature monitor is reading a temperature of" \
                   + str(read_temp(temp_sensor_1)[1]) + "degrees fahrenheit."
 
@@ -82,7 +92,5 @@ while True:
         server.sendmail(FROM, TO, MESSAGE)
         server.quit()
 
-        time.sleep(300)
 
-        time.sleep(5)
 
