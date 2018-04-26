@@ -37,7 +37,7 @@ temp_sensor_2 = '/sys/bus/w1/devices/28-03172293f1ff/w1_slave'
 
 SERVER = "braincoral.dunwoody.tec.mn.us"
 FROM = 'opensourcepialerts@example.com'
-SUBJECT = "Play.Dunwoody Server"
+SUBJECT = "Temperature Alert!!"
 TO = ['cgabrielson@dunwoody.edu', 'easandb@dunwoody.edu', 'smekylg@dunwoody.edu']
 
 
