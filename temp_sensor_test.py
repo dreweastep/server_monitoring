@@ -28,12 +28,12 @@ import os
 import time
 import smtplib
 from email.mime.text import MIMEText
-
-os.system('modprobe w1-gpio')
-os.system('modprobe w1-therm')
-
-temp_sensor_1 = '/sys/bus/w1/devices/28-031722a436ff/w1_slave'
-temp_sensor_2 = '/sys/bus/w1/devices/28-03172293f1ff/w1_slave'
+#
+# os.system('modprobe w1-gpio')
+# os.system('modprobe w1-therm')
+#
+# temp_sensor_1 = '/sys/bus/w1/devices/28-031722a436ff/w1_slave'
+# temp_sensor_2 = '/sys/bus/w1/devices/28-03172293f1ff/w1_slave'
 
 SERVER = "braincoral.dunwoody.tec.mn.us"
 FROM = 'opensourcepialerts@example.com'
@@ -49,13 +49,13 @@ def temp_raw(temp_sensor):
     return lines
 
 
-def send_mail(msg):
+def send_mail(message):
 
-    message = MIMEText(msg)
-    message['Subject'] = SUBJECT
+    MESSAGE = MIMEText(message)
+    MESSAGE['Subject'] = SUBJECT
 
     server = smtplib.SMTP(SERVER)
-    server.sendmail(FROM, TO, message.as_string())
+    server.sendmail(FROM, TO, MESSAGE.as_string())
     server.quit()
 
 
@@ -75,14 +75,14 @@ def read_temp(temp_sensor):
         return round(temp_c, 1), round(temp_f, 1)
 
 
-temp_values = []
-for i in range(0, 20):
-    print('Sensor 1:', read_temp(temp_sensor_1))
-    print('Sensor 2:', read_temp(temp_sensor_2))
-    print('')
-
-    temp_values.append(read_temp(temp_sensor_1)[1])
-    temp_values.append(read_temp(temp_sensor_2)[1])
+temp_values = [91, 91, 93, 97, 80, 92, 96, 91]
+# for i in range(0, 20):
+#     print('Sensor 1:', read_temp(temp_sensor_1))
+#     print('Sensor 2:', read_temp(temp_sensor_2))
+#     print('')
+#
+#     temp_values.append(read_temp(temp_sensor_1)[1])
+#     temp_values.append(read_temp(temp_sensor_2)[1])
 
 hot_readings = 0
 cold_readings = 0
@@ -94,18 +94,14 @@ for each in temp_values:
         cold_readings = cold_readings + 1
 
 if hot_readings > 5:
-    message = "The raspberry pi temperature monitor is reading an average temperature of " \
+    MESSAGE = "The raspberry pi temperature monitor is reading an average temperature of " \
               + str(sum(temp_values)/len(temp_values)) + " degrees fahrenheit."
 
-    send_mail(message)
+    send_mail(MESSAGE)
 
 
 if cold_readings > 5:
-    message = "The raspberry pi temperature monitor is reading an average temperature of " \
-              + str(sum(temp_values)/len(temp_values)) + " degrees fahrenheit."
+    MESSAGE = "The raspberry pi temperature monitor is reading an average temperature of" \
+              + str(sum(temp_values)/len(temp_values)) + "degrees fahrenheit."
 
-    send_mail(message)
-
-
-
-
+    send_mail(MESSAGE)
