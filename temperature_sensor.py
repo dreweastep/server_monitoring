@@ -90,6 +90,7 @@ for each in temp_values:
     if each > 90:
         hot_readings = hot_readings + 1
 
+
     if each < 42:
         cold_readings = cold_readings + 1
 
