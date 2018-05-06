@@ -42,7 +42,6 @@ TO = ['cgabrielson@dunwoody.edu', 'easandb@dunwoody.edu', 'smekylg@dunwoody.edu'
 
 
 def temp_raw(temp_sensor):
-
     f = open(temp_sensor, 'r')
     lines = f.readlines()
     f.close()
@@ -50,7 +49,6 @@ def temp_raw(temp_sensor):
 
 
 def send_mail(msg):
-
     message = MIMEText(msg)
     message['Subject'] = SUBJECT
 
@@ -60,7 +58,6 @@ def send_mail(msg):
 
 
 def read_temp(temp_sensor):
-
     lines = temp_raw(temp_sensor)
     while lines[0].strip()[-3:] != 'YES':
         time.sleep(0.2)
@@ -74,38 +71,42 @@ def read_temp(temp_sensor):
         temp_f = temp_c * 9.0 / 5.0 + 32.0
         return round(temp_c, 1), round(temp_f, 1)
 
+def count(temp_list, low, high):
+    temp_count = 0
 
-temp_values = []
+    for num in temp_list:
+        if num >= low and num <= high:
+            temp_count+= 1
+
+    return temp_count
+
+
+sensor1_values = []
+sensor2_values = []
 for i in range(0, 20):
-    print('Sensor 1:', read_temp(temp_sensor_1))
-    print('Sensor 2:', read_temp(temp_sensor_2))
-    print('')
+    sensor1_values.append(read_temp(temp_sensor_1)[1])
+    sensor2_values.append(read_temp(temp_sensor_2)[1])
 
-    temp_values.append(read_temp(temp_sensor_1)[1])
-    temp_values.append(read_temp(temp_sensor_2)[1])
-
-hot_readings = 0
-cold_readings = 0
-for each in temp_values:
-    if each > 90:
-        hot_readings = hot_readings + 1
-
-
-    if each < 42:
-        cold_readings = cold_readings + 1
-
-if hot_readings > 5:
-    message = "The raspberry pi temperature monitor is reading an average temperature of " \
-              + str(sum(temp_values)/len(temp_values)) + " degrees fahrenheit."
-
+if count(sensor1_values, 90, 257) > 5: #Temps above 90 and below 257 fahrenheit -- max value from sensor
+    message = "The raspberry pi temperature monitor is reading a temperature of " \
+              + max(sensor1_values) + " degrees fahrenheit."
     send_mail(message)
 
-
-if cold_readings > 5:
-    message = "The raspberry pi temperature monitor is reading an average temperature of " \
-              + str(sum(temp_values)/len(temp_values)) + " degrees fahrenheit."
-
+if count(sensor2_values, 90, 257) > 5: #Temps above 90 and below 257 fahrenheit -- max value from sensor
+    message = "The raspberry pi temperature monitor is reading a temperature of " \
+              + max(sensor1_values) + " degrees fahrenheit."
     send_mail(message)
+
+if count(sensor1_values, -67, 42) > 5: #Temps above -67 and below 42 farenheit -- min value from sensor
+    message = "The raspberry pi temperature monitor is reading a temperature of " \
+              + min(sensor1_values) + " degrees fahrenheit."
+    send_mail(message)
+
+if count(sensor2_values, -67, 42) > 5: #Temps above -67 and below 42 farenheit -- min value from sensor
+    message = "The raspberry pi temperature monitor is reading a temperature of " \
+              + min(sensor1_values) + " degrees fahrenheit."
+    send_mail(message)
+
 
 
 
