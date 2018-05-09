@@ -85,7 +85,7 @@ sensor1_values = []
 sensor2_values = []
 to_send_mail = False
 message = ""
-for i in range(1, 11):
+for i in range(0, 10):
     sensor1_values.append(read_temp(temp_sensor_1)[1])
     sensor2_values.append(read_temp(temp_sensor_2)[1])
 
