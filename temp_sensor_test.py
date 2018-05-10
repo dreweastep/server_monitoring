@@ -55,26 +55,25 @@ message = ""
 
 append_log(file_path, sensor1_values, sensor2_values)
 
-if count(sensor1_values, 90, 257) > 3: #Temps above 90 and below 257 fahrenheit -- max value from sensor
+if count(sensor1_values, 90, 257) > 3:  # Temps above 90 and below 257 fahrenheit -- max value from sensor
     message = message + "The raspberry pi temperature monitor is reading a temperature of " \
               + str(max(sensor1_values)) + " degrees fahrenheit from the sensor1 sensor.\n\n"
     to_send_mail = True
 
-if count(sensor2_values, 90, 257) > 3: #Temps above 90 and below 257 fahrenheit -- max value from sensor
+if count(sensor2_values, 90, 257) > 3:  # Temps above 90 and below 257 fahrenheit -- max value from sensor
     message = message + "The raspberry pi temperature monitor is reading a temperature of " \
               + str(max(sensor2_values)) + " degrees fahrenheit from the sensor2 sensor.\n\n"
     to_send_mail = True
 
-if count(sensor1_values, -67, 42) > 3: #Temps above -67 and below 42 farenheit -- min value from sensor
+if count(sensor1_values, -67, 42) > 3:  # Temps above -67 and below 42 farenheit -- min value from sensor
     message = message + "The raspberry pi temperature monitor is reading a temperature of " \
               + str(min(sensor1_values)) + " degrees fahrenheit from the sensor1 sensor.\n\n"
     to_send_mail = True
 
-if count(sensor2_values, -67, 42) > 3: #Temps above -67 and below 42 farenheit -- min value from sensor
+if count(sensor2_values, -67, 42) > 3:  # Temps above -67 and below 42 farenheit -- min value from sensor
     message = message + "The raspberry pi temperature monitor is reading a temperature of " \
               + str(min(sensor2_values)) + " degrees fahrenheit from the sensor2 sensor.\n\n"
     to_send_mail = True
 
 if to_send_mail:
     send_mail(message)
-
