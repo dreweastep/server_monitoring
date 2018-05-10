@@ -25,6 +25,7 @@
 # Recording temperature using ds18b20 sensor
 
 import os
+import datetime
 import time
 import smtplib
 from email.mime.text import MIMEText
@@ -35,10 +36,12 @@ os.system('modprobe w1-therm')
 temp_sensor_1 = '/sys/bus/w1/devices/28-031722a436ff/w1_slave'
 temp_sensor_2 = '/sys/bus/w1/devices/28-03172293f1ff/w1_slave'
 
+file_path = "temp_log.txt"
+
 SERVER = "braincoral.dunwoody.tec.mn.us"
 FROM = 'opensourcepialerts@example.com'
 SUBJECT = "Temperature Alert!!"
-TO = ['cgabrielson@dunwoody.edu', 'easandb@dunwoody.edu', 'smekylg@dunwoody.edu']
+TO = ['cgabrielson@dunwoody.edu', 'easandb@dunwoody.edu', 'smekylg@dunwoody.edu', 'remjamd@dunwoodyedu']
 
 
 def temp_raw(temp_sensor):
@@ -71,14 +74,22 @@ def read_temp(temp_sensor):
         temp_f = temp_c * 9.0 / 5.0 + 32.0
         return round(temp_c, 1), round(temp_f, 1)
 
+
 def count(temp_list, low, high):
     temp_count = 0
 
     for num in temp_list:
-        if num >= low and num <= high:
+        if low <= num <= high:
             temp_count+= 1
 
     return temp_count
+
+
+def append_log(file, sensor1_list, sensor2_list):
+    with open(file, "a") as data_log:
+        data_log.write("\n\n" + str(datetime.datetime.now().strftime("(%Y/%m/%d at %H:%M)")))
+        data_log.write("\nSensor 1 temps: " + str(sensor1_list))
+        data_log.write("\nSensor 2 temps: " + str(sensor2_list))
 
 
 sensor1_values = []
@@ -88,6 +99,8 @@ message = ""
 for i in range(0, 10):
     sensor1_values.append(read_temp(temp_sensor_1)[1])
     sensor2_values.append(read_temp(temp_sensor_2)[1])
+
+append_log(file_path, sensor1_values, sensor2_values)
 
 if count(sensor1_values, 90, 257) > 3: #Temps above 90 and below 257 fahrenheit -- max value from sensor
     message = message + "The raspberry pi temperature monitor is reading a temperature of " \

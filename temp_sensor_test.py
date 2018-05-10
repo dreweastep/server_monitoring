@@ -1,44 +1,16 @@
-# temperature_sensor.py
-#
-# Created by Drew Eastep
-#
-# Update log:
-#
-# 10/23/17 -- Created file
-#
-# 11/06/2017 -- Copied device serial number
-#
-# 11/13/2017 -- Adding code for second sensor and edited data
-#
-# 11/27/2017 -- Added serial code for second sensor
-#
-# 01/22/2018 -- Added SMTP email alerts
-#
-# 02/08/2018 -- Changed SMTP to send from internal dunwoody mail sensor with fake address.
-#
-# 03/22/2018 -- Code now takes in multiple values and sends emails only if multiple high readings are read.
-#
-# 03/29/2018 -- Fixed logical and syntax bugs
-#
-# 04/23/2018 -- Added MIME extension to properly format email
+# Test for temperature_sensor.py
 
-# Recording temperature using ds18b20 sensor
 
-import os
-import time
+import datetime
 import smtplib
 from email.mime.text import MIMEText
-#
-# os.system('modprobe w1-gpio')
-# os.system('modprobe w1-therm')
-#
-# temp_sensor_1 = '/sys/bus/w1/devices/28-031722a436ff/w1_slave'
-# temp_sensor_2 = '/sys/bus/w1/devices/28-03172293f1ff/w1_slave'
+
+file_path = "temp_log.txt"
 
 SERVER = "braincoral.dunwoody.tec.mn.us"
 FROM = 'opensourcepialerts@example.com'
 SUBJECT = "THIS IS A TEST"
-TO = ['cgabrielson@dunwoody.edu', 'easandb@dunwoody.edu', 'smekylg@dunwoody.edu']
+TO = ['cgabrielson@dunwoody.edu', 'easandb@dunwoody.edu', 'smekylg@dunwoody.edu', 'remjamd@dunwoodyedu']
 
 
 def temp_raw(temp_sensor):
@@ -63,16 +35,25 @@ def count(temp_list, low, high):
     temp_count = 0
 
     for num in temp_list:
-        if num >= low and num <= high:
+        if low <= num <= high:
             temp_count+= 1
 
     return temp_count
+
+
+def append_log(file, sensor1_list, sensor2_list):
+    with open(file, "a") as data_log:
+        data_log.write("\n\n" + str(datetime.datetime.now().strftime("(%Y/%m/%d at %H:%M)")))
+        data_log.write("\nSensor 1 temps: " + str(sensor1_list))
+        data_log.write("\nSensor 2 temps: " + str(sensor2_list))
 
 
 sensor1_values = [98, 93, 45, 94, 90, 54, 32, 76, 88]
 sensor2_values = [98, 93, 45, 94, 90, 54, 32, 76, 88, 100]
 to_send_mail = False
 message = ""
+
+append_log(file_path, sensor1_values, sensor2_values)
 
 if count(sensor1_values, 90, 257) > 3: #Temps above 90 and below 257 fahrenheit -- max value from sensor
     message = message + "The raspberry pi temperature monitor is reading a temperature of " \
